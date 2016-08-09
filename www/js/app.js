@@ -4,7 +4,7 @@ angular.module('todo', ['ionic'])
  * from local storage, and also lets us save and load the
  * last active project index.
  */
-.factory('Projects', function() {
+.factory('Categories', function() {
   return {
     all: function() {
       var projectString = window.localStorage['projects'];
@@ -32,23 +32,23 @@ angular.module('todo', ['ionic'])
   }
 })
 
-.controller('TodoCtrl', function($scope, $timeout, $ionicModal, Projects, $ionicSideMenuDelegate) {
+.controller('TodoCtrl', function($scope, $timeout, $ionicModal, Categories, $ionicSideMenuDelegate, $ionicListDelegate) {
 
   // A utility function for creating a new project
   // with the given projectTitle
   var createProject = function(projectTitle) {
-    var newProject = Projects.newProject(projectTitle);
+    var newProject = Categories.newProject(projectTitle);
     $scope.projects.push(newProject);
-    Projects.save($scope.projects);
+    Categories.save($scope.projects);
     $scope.selectProject(newProject, $scope.projects.length-1);
   }
 
 
   // Load or initialize projects
-  $scope.projects = Projects.all();
+  $scope.projects = Categories.all();
 
   // Grab the last active, or the first project
-  $scope.activeProject = $scope.projects[Projects.getLastActiveIndex()];
+  $scope.activeProject = $scope.projects[Categories.getLastActiveIndex()];
 
   // Called to create a new project
   $scope.newProject = function() {
@@ -61,13 +61,19 @@ angular.module('todo', ['ionic'])
   // Called to select the given project
   $scope.selectProject = function(project, index) {
     $scope.activeProject = project;
-    Projects.setLastActiveIndex(index);
+    Categories.setLastActiveIndex(index);
     $ionicSideMenuDelegate.toggleLeft(false);
   };
 
   // Create our modal
   $ionicModal.fromTemplateUrl('new-task.html', function(modal) {
     $scope.taskModal = modal;
+  }, {
+    scope: $scope
+  });
+
+  $ionicModal.fromTemplateUrl('edit-task.html', function(modal) {
+    $scope.editTaskModal = modal;
   }, {
     scope: $scope
   });
@@ -82,29 +88,40 @@ angular.module('todo', ['ionic'])
     $scope.taskModal.hide();
 
     // Inefficient, but save all the projects
-    Projects.save($scope.projects);
+    Categories.save($scope.projects);
 
     task.title = "";
   };
+
+
 
   $scope.deleteTask= function(task){
     if(!$scope.activeProject || !task)return;
 
     $scope.activeProject.tasks.splice($scope.activeProject.tasks.indexOf(task),1);
-    Projects.save($scope.projects);
+    Categories.save($scope.projects);
     task.title="";
+    $ionicListDelegate.closeOptionButtons();
   }
 
   $scope.newTask = function() {
     $scope.taskModal.show();
   };
 
+  $scope.editTask=function(task){
+  }
+
   $scope.closeNewTask = function() {
     $scope.taskModal.hide();
   }
 
+  $scope.closeEditTask=function(){
+    $scope.editTaskModal.hide();
+  }
+
   $scope.toggleProjects = function() {
     $ionicSideMenuDelegate.toggleLeft();
+    $ionicListDelegate.closeOptionButtons();
   };
 
 
