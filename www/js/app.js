@@ -107,17 +107,78 @@ angular.module('todo', ['ionic'])
   $scope.newTask = function() {
     $scope.taskModal.show();
   };
-
   $scope.editTask=function(task){
+  
+
+    //remember task to change it later
+    $scope.tempEditTask = task;
+
+    //show the Modal 
+      $scope.editTaskModal.show();
+  };
+
+//Concept..
+  $scope.editTitleTask = function(form){
+     // if(!$scope.activeProject || !task)return;
+     // $scope.activeProject.tasks[$scope.activeProject.tasks.indexOf(task)].title = newTitle;
+     // $scope.editTaskModal.hide();
+     // console.log(form.title);
+     var item={};
+     item.title = form.title;
+     console.log(item.title);
+
+     //get index of item from array
+     var editIndex = $scope.activeProject.tasks.indexOf($scope.tempEditTask);
+     console.log(editIndex);
+
+     //swap
+     // console.log($scope.activeProject.tasks[editIndex].title);
+     $scope.activeProject.tasks[editIndex]=item;
+     // console.log($scope.activeProject.tasks[editIndex].title);
+     $scope.editTaskModal.hide();
+    Categories.save($scope.projects);
+     
   }
+  
+  /*
+//editing a task
+  $scope.editTask=function(tasks){
+    var taskToEdit = tasks;
+    console.log(taskToEdit);
+    var modalInstance = $modal.open({
+      templateUrl:'edit-task.html',
+      controller: modalInstanceCtrlr,
+      resolve: {
+        tasks: function(){
+          return taskToEdit;
+        }
+      },
+      scope: $scope.$new()
+    });
+    modalInstance.result.then(function(selectedItem){
+        console.log('selectedItem: ' + selectedItem.title);
+          taskToEdit.title= selectedItem.title;
+    }, function(){
+      console.log('Modal dismissed at: ' + new Date());
+    });
+  };
+
+  modalInstanceCtrlr= function($scope, $modalInstance, tasks){
+    $scope.input = angular.copy(tasks);
+    console.log(tasks);
+    $scope.saveTask ={
+      $modalInstance.close($scope.input);
+    };
+  };
+  */
 
   $scope.closeNewTask = function() {
     $scope.taskModal.hide();
   }
 
-  $scope.closeEditTask=function(){
-    $scope.editTaskModal.hide();
-  }
+
+  // $scope.closeEditTask=func7);
+  // }
 
   $scope.toggleProjects = function() {
     $ionicSideMenuDelegate.toggleLeft();
